@@ -1,11 +1,11 @@
 import turtle
 import time
 import random
-# minute video 40min; enalce:https://youtu.be/lKzEvbGbbPo
+
 #variables globales
-window_width=600
-window_height=600
-delay = 0.1
+window_width=600#tamaño pantalla x
+window_height=600#tamaño pantalla y
+delay = 0.15#tiempo espera moverse
 segmentos_cuerpo=[]
 score=0
 high_score=0
@@ -19,14 +19,14 @@ window.bgcolor(color_fondo)#color fondo
 
 
 # snake objeto
-head = turtle.Turtle()#objeto snake
+headSnake = turtle.Turtle()#objeto snake
 # ajustes iniciales snake
-head.speed(0)  # velocidad animacion(movimiento)
-head.shape("square")  # forma snake (cubo)
-head.color("dark green")  # color snake
-head.penup()  # elimina el rastro de la animacion
-head.goto(0, 0)  # posicion (centro ventana)
-head.direction = "stop"  # direccion (up, down, right, left)
+headSnake.speed(0)  # velocidad animacion(movimiento)
+headSnake.shape("square")  # forma snake (cubo)
+headSnake.color("dark green")  # color snake
+headSnake.penup()  # elimina el rastro de la animacion
+headSnake.goto(0, 0)  # posicion (centro ventana)
+headSnake.direction = "stop"  # direccion (up, down, right, left)
 
 # food configuracion
 food = turtle.Turtle()#objeto comida
@@ -36,16 +36,25 @@ food.color("red")
 food.penup()
 food.goto(100, 0)
 
-#score objeto
+#score objeto texto
 textScore=turtle.Turtle()
 textScore.speed(0)
 textScore.color(color_fondo)
 textScore.penup()
-textScore.hideturtle()
+textScore.hideturtle()#sconder raton
 textScore.goto(0,255)
-textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',24))
+textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',24))#texto mostrar
 
-#mostrar HUD
+#start objeto texto
+textStart=turtle.Turtle()
+textStart.speed(0)
+textStart.color('white')
+textStart.penup()
+textStart.hideturtle()
+textStart.goto(0,180)
+textStart.write(f'Move to start',align='center',font=('Impact',22))
+
+
 def MostrarHUD():
     #actualizar colores textos
     if textScore.pencolor()==color_fondo:
@@ -53,152 +62,163 @@ def MostrarHUD():
     else:
         textScore.color(color_fondo)
     #actualizar pantalla
-    textScore.clear()
+    textScore.clear()#limpiar texto
     textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
-    
-# movimientos del snake
-def mov():
-    oY = head.ycor()  # guardar posicion y
-    oX = head.xcor()  # guardar posicion x
-    if head.direction == "up":
-        head.sety(oY + 10)
-    elif head.direction == "down":
-        head.sety(oY - 10)
-    elif head.direction == "right":
-        head.setx(oX + 10)
-    elif head.direction == "left":
-        head.setx(oX - 10)
 
+def movimientoHeadSnake():
+    oY = headSnake.ycor()  # guardar posicion y
+    oX = headSnake.xcor()  # guardar posicion x
+    if headSnake.direction != "stop":#borrar texto start
+        textStart.clear()
+    #mover head
+    distanciaMover=20#cantidad de distancia a mover
+    if headSnake.direction == "up":#direccion
+        headSnake.sety(oY + distanciaMover)#actualizar posicion
+    elif headSnake.direction == "down":
+        headSnake.sety(oY - distanciaMover)
+    elif headSnake.direction == "right":
+        headSnake.setx(oX + distanciaMover)
+    elif headSnake.direction == "left":
+        headSnake.setx(oX - distanciaMover)
 
-# teclado movimiento snake
+#cambio direccion snake por teclado
 def dirUp():  # que hacer
-    if head.direction!='down':#que no se superponga con el cuerpo
-        head.direction = "up"#cambio de direccion
-
+    if headSnake.direction!='down':#que no se superponga con el cuerpo
+        headSnake.direction = "up"#cambio de direccion
 
 def dirDown():
-    if head.direction!='up':
-        head.direction = "down"
-
+    if headSnake.direction!='up':
+        headSnake.direction = "down"
 
 def dirRight():
-    if head.direction!='left':
-        head.direction = "right"
-
+    if headSnake.direction!='left':
+        headSnake.direction = "right"
 
 def dirLeft():
-    if head.direction!='right':
-        head.direction = "left"
+    if headSnake.direction!='right':
+        headSnake.direction = "left"
 
-def dirSpace():  # que hacer
+def dirSpace():
     MostrarHUD()
-    
+
+#teclado entradas teclas
 window.listen()  # escuchando teclado
-window.onkeypress(dirUp, "Up")  # (que hacer,tecla)
+window.onkeypress(dirUp, "Up")  # (que hacer,tecla a pulsar)
 window.onkeypress(dirDown, "Down")
 window.onkeypress(dirRight, "Right")
 window.onkeypress(dirLeft, "Left")
 window.onkeypress(MostrarHUD,"space")
 
-# funciones food
 def ColisionFoodSnake():
-    if head.distance(food) < 30:
-        Reaparecer()
-        SegmentosCuerpo()
-        ActualizarPuntuacion(10)
+    #calcular distancia del headSnake objeto al objeto food 
+    if headSnake.distance(food) < 30:#la comio
+        ActualizarPuntuacion(10)#sumar 10 puntos
+        NuevoSegmentoCuerpo()#añadir un segmento mas al cuerpo
+        ReaparecerFood()#añadir otra manzana
 
 def ActualizarPuntuacion(sumar=0,reiniciar=False):
+    #convertir en global para solucionar problema de acceder al valor 
     global score
     global high_score
-    
+    #actualizar puntos y puntuacion maxima
     if not reiniciar:
         score=score+sumar
         if score>high_score:
             high_score=score
-    else:
+    else:#fin programa, reiniciar puntos
+        if score>high_score:
+            high_score=score
         score=0
-        
+    #actualziar texto pantalla
     textScore.clear()
     textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
-    
+
 def ColisionVentana():
+    tiempoDelay=0.55
+    distanciaMover=20
     mitadAnchoPantalla=window_width/2
     mitadAltoPantalla=window_height/2
-    ox=head.xcor()
-    oy=head.ycor()
+    ox=0
+    oy=0
+    #coger posicion ultimo segmento
     for i in segmentos_cuerpo:
         ox=i.xcor()
         oy=i.ycor()
-    tiempoDelay=0.5
-    #cambios de posicion, segun el eje en el que salga moverlo para el borde contrario -20
-    if ox>mitadAnchoPantalla:
-        time.sleep(tiempoDelay)
-        head.goto(-(mitadAnchoPantalla-20),oy)
-        movBody()
+    #cambios de posicion, invertir posicion del eje del que se escape - distanciaMover
+    if ox>mitadAnchoPantalla:#se sale de pantalla
+        time.sleep(tiempoDelay)#esperar para moverlo a la zona de la pantalla
+        headSnake.goto(-(mitadAnchoPantalla-distanciaMover),oy)#moverlo
+        movimientoBody()#actualizar resto cuerpo
     elif ox< -mitadAnchoPantalla:
         time.sleep(tiempoDelay)
-        head.goto((mitadAnchoPantalla-20),oy)
-        movBody()
+        headSnake.goto((mitadAnchoPantalla-distanciaMover),oy)
+        movimientoBody()
     elif oy>mitadAltoPantalla:
         time.sleep(tiempoDelay)
-        head.goto(ox,-(mitadAltoPantalla-20))
-        movBody()
+        headSnake.goto(ox,-(mitadAltoPantalla-distanciaMover))
+        movimientoBody()
     elif oy< -mitadAltoPantalla:
         time.sleep(tiempoDelay)
-        head.goto(ox,(mitadAltoPantalla-20))
-        movBody()
-        
-def Reaparecer():
+        headSnake.goto(ox,(mitadAltoPantalla-distanciaMover))
+        movimientoBody()
+
+def ReaparecerFood():
     minDistance = 30
-    # valor
+    # valor aleatorio dentro de la ventana
     px = random.randint(minDistance, int((window_width / 2) - minDistance))
     py = random.randint(minDistance, int((window_height / 2) - minDistance))
-    # signo
+    # signo(cuadrante)
     if random.randint(1, 2) == 1:
-        px = -(px)
+        px *= -1
     if random.randint(1, 2) == 1:
-        py = -(py)
+        py *= -1
     food.goto(px, py)
 
-def SegmentosCuerpo():
+def NuevoSegmentoCuerpo():
+    #objeto segmento nuevo
     nuevo_segmento=turtle.Turtle()
     nuevo_segmento.speed(0)
     nuevo_segmento.shape("square")
     nuevo_segmento.color("green")
     nuevo_segmento.penup()
-    segmentos_cuerpo.append(nuevo_segmento)
-    
-    movBody()
+    segmentos_cuerpo.append(nuevo_segmento)#guardar segemento en una lista
+    movimientoBody()#actualizar posicion de los segmentos
 
-def movBody():
-    total_segmentos=len(segmentos_cuerpo)
+def movimientoBody():
+    total_segmentos=len(segmentos_cuerpo)#cantidad de segmentos del cuerpo
+    #actualizar el primer segmento a parte
+    if total_segmentos>0:
+        ox=headSnake.xcor()
+        oy=headSnake.ycor()
+        segmentos_cuerpo[0].goto(ox,oy)
+    #actualizar posicion de los segmentos menos el primero
     for i in range(total_segmentos-1,0,-1):
+        #coger posicion x,y del segmento anterior(ya actualizado)
         ox=segmentos_cuerpo[i-1].xcor()
         oy=segmentos_cuerpo[i-1].ycor()
-        segmentos_cuerpo[i].goto(ox,oy)
-    if total_segmentos>0:
-        ox=head.xcor()
-        oy=head.ycor()
-        segmentos_cuerpo[0].goto(ox,oy)
-        mov()
-      
+        segmentos_cuerpo[i].goto(ox,oy)#actualizar posicion del segmento actual
+    movimientoHeadSnake()#mover cabeza
+
 def colisionSnakeBody():
-    for segmento in segmentos_cuerpo:
-        if segmento.distance(head)<10:#fin partida
-            time.sleep(1)
-            head.goto(0,0)
-            head.direction="stop"
+    for segmento in segmentos_cuerpo:#mirar todos los segementos
+        if segmento.distance(headSnake)<10:#fin partida
+            time.sleep(1)#esperar 1s
+            headSnake.goto(0,0)
+            headSnake.direction="stop"
+            #sacar segementos de la zona de la pantalla
             for segmento1 in segmentos_cuerpo:
-                segmento1.goto(window_width+60,window_height+60)
-            segmentos_cuerpo.clear()
-            ActualizarPuntuacion(0,True)
-            
-#controlador/ejecutador
-while True:
-    window.update()
+                segmento1.goto(window_width+30,window_height+30)
+            segmentos_cuerpo.clear()#limpiar lista
+            ActualizarPuntuacion(0,True)#reiniciar puntuacion
+            #mostrar texto start
+            textStart.clear()
+            textStart.write(f'Move to start',align='center',font=('Impact',22))
+
+#controlador/ejecutador programa
+while True:#bucle infinito
+    window.update()#actualizar canvas pantalla 
     ColisionVentana()
     ColisionFoodSnake()
     colisionSnakeBody()
-    mov()
-    movBody()
-    time.sleep(delay)
+    movimientoBody()#moviemeinto del snake
+    time.sleep(delay)#esperar en segundos y repetir bucle 
