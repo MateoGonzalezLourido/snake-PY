@@ -9,21 +9,29 @@ delay = 0.15#tiempo espera moverse
 segmentos_cuerpo=[]
 score=0
 high_score=0
-color_fondo='light green'
+color_fondo='#29dc4f'
 
 window = turtle.Screen()#ventana
 # ajustes ventana
 window.title("Juego Snake Python-By Mateo González")#titulo ventana
 window.setup(width=window_width, height=window_height)#tamaño ventana
-window.bgcolor(color_fondo)#color fondo
+window.bgcolor('#29bbdc')#color fondo
 
-
+#campo juego objeto
+campoJuego = turtle.Turtle()#objeto snake
+# ajustes iniciales snake
+campoJuego.speed(0)  # velocidad animacion(movimiento)
+campoJuego.shape("square")  # forma snake (cubo)
+campoJuego.color(color_fondo)  # color snake
+campoJuego.penup()  # elimina el rastro de la animacion
+campoJuego.goto(0, 0)  # posicion (centro ventana)
+campoJuego.shapesize(30.5,30.5,1)
 # snake objeto
 headSnake = turtle.Turtle()#objeto snake
 # ajustes iniciales snake
 headSnake.speed(0)  # velocidad animacion(movimiento)
 headSnake.shape("square")  # forma snake (cubo)
-headSnake.color("dark green")  # color snake
+headSnake.color("#118057")  # color snake
 headSnake.penup()  # elimina el rastro de la animacion
 headSnake.goto(0, 0)  # posicion (centro ventana)
 headSnake.direction = "stop"  # direccion (up, down, right, left)
@@ -148,38 +156,48 @@ def ColisionVentana():
     if ox>mitadAnchoPantalla:#se sale de pantalla
         time.sleep(tiempoDelay)#esperar para moverlo a la zona de la pantalla
         headSnake.goto(-(mitadAnchoPantalla-distanciaMover),oy)#moverlo
-        movimientoBody()#actualizar resto cuerpo
     elif ox< -mitadAnchoPantalla:
         time.sleep(tiempoDelay)
         headSnake.goto((mitadAnchoPantalla-distanciaMover),oy)
-        movimientoBody()
     elif oy>mitadAltoPantalla:
         time.sleep(tiempoDelay)
         headSnake.goto(ox,-(mitadAltoPantalla-distanciaMover))
-        movimientoBody()
     elif oy< -mitadAltoPantalla:
         time.sleep(tiempoDelay)
         headSnake.goto(ox,(mitadAltoPantalla-distanciaMover))
-        movimientoBody()
 
 def ReaparecerFood():
     minDistance = 30
-    # valor aleatorio dentro de la ventana
-    px = random.randint(minDistance, int((window_width / 2) - minDistance))
-    py = random.randint(minDistance, int((window_height / 2) - minDistance))
-    # signo(cuadrante)
-    if random.randint(1, 2) == 1:
-        px *= -1
-    if random.randint(1, 2) == 1:
-        py *= -1
-    food.goto(px, py)
+    continuar=True
+    while continuar:
+        # valor aleatorio dentro de la ventana
+        px = random.randint(minDistance, int((window_width / 2) - minDistance))
+        py = random.randint(minDistance, int((window_height / 2) - minDistance))
+        # signo(cuadrante)
+        if random.randint(1, 2) == 1:
+            px *= -1
+        if random.randint(1, 2) == 1:
+            py *= -1
+        food.color(color_fondo)
+        food.goto(px, py)
+        #comprobar si no aparece encima de la snake
+        valida=True
+        if segmento.distance(headSnake)<=30:#fin partida
+            valida=False
+        for segmento in segmentos_cuerpo:#mirar todos los segementos
+            if segmento.distance(food)<=30:#fin partida
+                valida=False
+                break
+        if valida:
+            food.color('red')
+            continuar=False
 
 def NuevoSegmentoCuerpo():
     #objeto segmento nuevo
     nuevo_segmento=turtle.Turtle()
     nuevo_segmento.speed(0)
     nuevo_segmento.shape("square")
-    nuevo_segmento.color("green")
+    nuevo_segmento.color("#138d46")
     nuevo_segmento.penup()
     segmentos_cuerpo.append(nuevo_segmento)#guardar segemento en una lista
     movimientoBody()#actualizar posicion de los segmentos
