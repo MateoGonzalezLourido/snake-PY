@@ -1,7 +1,8 @@
 import turtle
 import time
 import random
-
+# minute video 40min; enalce:https://youtu.be/lKzEvbGbbPo
+#variables globales
 window_width=600
 window_height=600
 delay = 0.1
@@ -9,8 +10,7 @@ segmentos_cuerpo=[]
 score=0
 high_score=0
 color_fondo='light green'
-tiempoJuego=0
-# minute video 40min; enalce:https://youtu.be/lKzEvbGbbPo
+
 window = turtle.Screen()#ventana
 # ajustes ventana
 window.title("Juego Snake Python-By Mateo González")#titulo ventana
@@ -20,7 +20,6 @@ window.bgcolor(color_fondo)#color fondo
 
 # snake objeto
 head = turtle.Turtle()#objeto snake
-
 # ajustes iniciales snake
 head.speed(0)  # velocidad animacion(movimiento)
 head.shape("square")  # forma snake (cubo)
@@ -44,36 +43,19 @@ textScore.color(color_fondo)
 textScore.penup()
 textScore.hideturtle()
 textScore.goto(0,255)
-textScore.write(f'Score 0 / High Score 0',align='center',font=('Impact',24))
-#temporizador objeto
-textTime=turtle.Turtle()
-textTime.speed(0)
-textTime.color(color_fondo)
-textTime.penup()
-textTime.hideturtle()
-textTime.goto(235,260)
-textTime.write(f'Time {tiempoJuego}s',align='center',font=('Impact',16))
+textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',24))
 
 #mostrar HUD
 def MostrarHUD():
     #actualizar colores textos
     if textScore.pencolor()==color_fondo:
         textScore.color('white')
-        textTime.color('white')
     else:
         textScore.color(color_fondo)
-        textTime.color(color_fondo)
     #actualizar pantalla
     textScore.clear()
-    textTime.clear()
-    textScore.write(f'Score 0 / High Score 0',align='center',font=('Impact',24))
-    textTime.write(f'Time {tiempoJuego}s',align='center',font=('Impact',16))
-#actualziar temporizador
-def actualizarTimer():
-    tiempoJuego+=1
-    textTime.write(f'Time ${tiempoJuego}s',align='left',font=('Impact',15))
-    textTime.ontimer(actualizarTimer,1000)
-
+    textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
+    
 # movimientos del snake
 def mov():
     oY = head.ycor()  # guardar posicion y
@@ -123,12 +105,30 @@ def ColisionFoodSnake():
     if head.distance(food) < 30:
         Reaparecer()
         SegmentosCuerpo()
+        ActualizarPuntuacion(10)
+
+def ActualizarPuntuacion(sumar=0,reiniciar=False):
+    global score
+    global high_score
+    
+    if not reiniciar:
+        score=score+sumar
+        if score>high_score:
+            high_score=score
+    else:
+        score=0
         
+    textScore.clear()
+    textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
+    
 def ColisionVentana():
     mitadAnchoPantalla=window_width/2
     mitadAltoPantalla=window_height/2
     ox=head.xcor()
     oy=head.ycor()
+    for i in segmentos_cuerpo:
+        ox=i.xcor()
+        oy=i.ycor()
     tiempoDelay=0.5
     #cambios de posicion, segun el eje en el que salga moverlo para el borde contrario -20
     if ox>mitadAnchoPantalla:
@@ -167,6 +167,7 @@ def SegmentosCuerpo():
     nuevo_segmento.color("green")
     nuevo_segmento.penup()
     segmentos_cuerpo.append(nuevo_segmento)
+    
     movBody()
 
 def movBody():
@@ -179,12 +180,25 @@ def movBody():
         ox=head.xcor()
         oy=head.ycor()
         segmentos_cuerpo[0].goto(ox,oy)
-        
+        mov()
+      
+def colisionSnakeBody():
+    for segmento in segmentos_cuerpo:
+        if segmento.distance(head)<10:#fin partida
+            time.sleep(1)
+            head.goto(0,0)
+            head.direction="stop"
+            for segmento1 in segmentos_cuerpo:
+                segmento1.goto(window_width+60,window_height+60)
+            segmentos_cuerpo.clear()
+            ActualizarPuntuacion(0,True)
+            
 #controlador/ejecutador
 while True:
     window.update()
     ColisionVentana()
     ColisionFoodSnake()
+    colisionSnakeBody()
     mov()
     movBody()
     time.sleep(delay)
