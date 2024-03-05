@@ -143,7 +143,7 @@ def ActualizarPuntuacion(sumar=0,reiniciar=False):
 
 def ColisionVentana():
     tiempoDelay=0.55
-    distanciaMover=20
+    distanciaMover=30
     mitadAnchoPantalla=window_width/2
     mitadAltoPantalla=window_height/2
     ox=0
@@ -169,7 +169,7 @@ def ColisionVentana():
 def ReaparecerFood():
     minDistance = 30
     continuar=True
-    while continuar:
+    while continuar==True:
         # valor aleatorio dentro de la ventana
         px = random.randint(minDistance, int((window_width / 2) - minDistance))
         py = random.randint(minDistance, int((window_height / 2) - minDistance))
@@ -178,19 +178,7 @@ def ReaparecerFood():
             px *= -1
         if random.randint(1, 2) == 1:
             py *= -1
-        food.color(color_fondo)
         food.goto(px, py)
-        #comprobar si no aparece encima de la snake
-        valida=True
-        if segmento.distance(headSnake)<=30:#fin partida
-            valida=False
-        for segmento in segmentos_cuerpo:#mirar todos los segementos
-            if segmento.distance(food)<=30:#fin partida
-                valida=False
-                break
-        if valida:
-            food.color('red')
-            continuar=False
 
 def NuevoSegmentoCuerpo():
     #objeto segmento nuevo
