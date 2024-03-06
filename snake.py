@@ -10,6 +10,7 @@ segmentos_cuerpo=[]
 score=0
 high_score=0
 color_fondo='#29dc4f'
+lista_manzanas=[]
 
 window = turtle.Screen()#ventana
 # ajustes ventana
@@ -43,6 +44,14 @@ food.shape("circle")
 food.color("red")
 food.penup()
 food.goto(100, 0)
+
+# food2 configuracion
+food2 = turtle.Turtle()#objeto comida
+food2.speed(0)#se mueve al instante(sin animacion)
+food2.shape("circle")
+food2.color(color_fondo)
+food2.penup()
+food2.goto(-100, 0)
 
 #score objeto texto
 textScore=turtle.Turtle()
@@ -122,7 +131,13 @@ def ColisionFoodSnake():
     if headSnake.distance(food) < 30:#la comio
         ActualizarPuntuacion(10)#sumar 10 puntos
         NuevoSegmentoCuerpo()#añadir un segmento mas al cuerpo
-        ReaparecerFood()#añadir otra manzana
+        if score==100:
+            ReaparecerFood(2)#añadir otra manzana
+        ReaparecerFood(1)#meter otra igual
+    if headSnake.distance(food2) < 30:#la comio
+        ActualizarPuntuacion(10)
+        NuevoSegmentoCuerpo()
+        ReaparecerFood(2)#meter otra igual
 
 def ActualizarPuntuacion(sumar=0,reiniciar=False):
     #convertir en global para solucionar problema de acceder al valor 
@@ -166,17 +181,32 @@ def ColisionVentana():
         time.sleep(tiempoDelay)
         headSnake.goto(ox,(mitadAltoPantalla-distanciaMover))
 
-def ReaparecerFood():
+def ReaparecerFood(manzana=1):
     minDistance = 30
-    # valor aleatorio dentro de la ventana
-    px = random.randint(minDistance, int((window_width / 2) - minDistance))
-    py = random.randint(minDistance, int((window_height / 2) - minDistance))
-    # signo(cuadrante)
-    if random.randint(1, 2) == 1:
-        px *= -1
-    if random.randint(1, 2) == 1:
-        py *= -1
-    food.goto(px, py)
+
+    if manzana==1:#solo una manzana
+        # valor aleatorio dentro de la ventana
+        px = random.randint(minDistance, int((window_width / 2) - minDistance))
+        py = random.randint(minDistance, int((window_height / 2) - minDistance))
+        # signo(cuadrante)
+        if random.randint(1, 2) == 1:
+            px *= -1
+        if random.randint(1, 2) == 1:
+            py *= -1
+        food.goto(px, py)
+    if manzana==2:#la segunda manzana
+        # valor aleatorio dentro de la ventana
+        px = random.randint(minDistance, int((window_width / 2) - minDistance))
+        py = random.randint(minDistance, int((window_height / 2) - minDistance))
+        # signo(cuadrante)
+        if random.randint(1, 2) == 1:
+            px *= -1
+        if random.randint(1, 2) == 1:
+            py *= -1
+        food2.goto(px, py)
+        if score==100:#mostrar manzana 2
+            food2.color('#802411')
+
 
 def NuevoSegmentoCuerpo():
     #objeto segmento nuevo
