@@ -71,7 +71,6 @@ textStart.hideturtle()
 textStart.goto(0,180)
 textStart.write(f'Move to start',align='center',font=('Impact',22))
 
-
 def MostrarHUD():
     #actualizar colores textos
     if textScore.pencolor()==color_fondo:
@@ -164,9 +163,13 @@ def ColisionVentana():
     ox=0
     oy=0
     #coger posicion ultimo segmento
-    for i in segmentos_cuerpo:
-        ox=i.xcor()
-        oy=i.ycor()
+    if len(segmentos_cuerpo)>0:
+        for i in segmentos_cuerpo:
+            ox=i.xcor()
+            oy=i.ycor()
+    else:
+        ox=headSnake.xcor()
+        oy=headSnake.ycor()
     #cambios de posicion, invertir posicion del eje del que se escape - distanciaMover
     if ox>mitadAnchoPantalla:#se sale de pantalla
         time.sleep(tiempoDelay)#esperar para moverlo a la zona de la pantalla
@@ -234,19 +237,20 @@ def movimientoBody():
     movimientoHeadSnake()#mover cabeza
 
 def colisionSnakeBody():
-    for segmento in segmentos_cuerpo:#mirar todos los segementos
-        if segmento.distance(headSnake)<10:#fin partida
-            time.sleep(1)#esperar 1s
-            headSnake.goto(0,0)
-            headSnake.direction="stop"
-            #sacar segementos de la zona de la pantalla
-            for segmento1 in segmentos_cuerpo:
-                segmento1.goto(window_width+30,window_height+30)
-            segmentos_cuerpo.clear()#limpiar lista
-            ActualizarPuntuacion(0,True)#reiniciar puntuacion
-            #mostrar texto start
-            textStart.clear()
-            textStart.write(f'Move to start',align='center',font=('Impact',22))
+    if len(segmentos_cuerpo)>0:
+        for segmento in segmentos_cuerpo:#mirar todos los segementos
+            if segmento.distance(headSnake)<10:#fin partida
+                time.sleep(1)#esperar 1s
+                headSnake.goto(0,0)
+                headSnake.direction="stop"
+                #sacar segementos de la zona de la pantalla
+                for segmento1 in segmentos_cuerpo:
+                    segmento1.goto(window_width+30,window_height+30)
+                segmentos_cuerpo.clear()#limpiar lista
+                ActualizarPuntuacion(0,True)#reiniciar puntuacion
+                #mostrar texto start
+                textStart.clear()
+                textStart.write(f'Move to start',align='center',font=('Impact',22))
 
 #controlador/ejecutador programa
 while True:#bucle infinito
