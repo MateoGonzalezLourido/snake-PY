@@ -210,6 +210,17 @@ def ReaparecerFood(manzana=1):
         if score==100:#mostrar manzana 2
             food2.color('#802411')
 
+    continuar=True
+    while continuar==True:
+        # valor aleatorio dentro de la ventana
+        px = random.randint(minDistance, int((window_width / 2) - minDistance))
+        py = random.randint(minDistance, int((window_height / 2) - minDistance))
+        # signo(cuadrante)
+        if random.randint(1, 2) == 1:
+            px *= -1
+        if random.randint(1, 2) == 1:
+            py *= -1
+        food.goto(px, py)
 
 def NuevoSegmentoCuerpo():
     #objeto segmento nuevo
