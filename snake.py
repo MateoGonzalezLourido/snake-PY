@@ -16,17 +16,8 @@ window = turtle.Screen()#ventana
 # ajustes ventana
 window.title("Juego Snake Python-By Mateo González")#titulo ventana
 window.setup(width=window_width, height=window_height)#tamaño ventana
-window.bgcolor('#29bbdc')#color fondo
+window.bgcolor(color_fondo)#color fondo
 
-#campo juego objeto
-campoJuego = turtle.Turtle()#objeto snake
-# ajustes iniciales snake
-campoJuego.speed(0)  # velocidad animacion(movimiento)
-campoJuego.shape("square")  # forma snake (cubo)
-campoJuego.color(color_fondo)  # color snake
-campoJuego.penup()  # elimina el rastro de la animacion
-campoJuego.goto(0, 0)  # posicion (centro ventana)
-campoJuego.shapesize(30.5,30.5,1)
 # snake objeto
 headSnake = turtle.Turtle()#objeto snake
 # ajustes iniciales snake
@@ -55,7 +46,6 @@ food2.goto(-100, 0)
 
 #score objeto texto
 textScore=turtle.Turtle()
-textScore.speed(0)
 textScore.color(color_fondo)
 textScore.penup()
 textScore.hideturtle()#sconder raton
@@ -64,7 +54,6 @@ textScore.write(f'Score {score} / High Score {high_score}',align='center',font=(
 
 #start objeto texto
 textStart=turtle.Turtle()
-textStart.speed(0)
 textStart.color('white')
 textStart.penup()
 textStart.hideturtle()
@@ -73,13 +62,14 @@ textStart.write(f'Move to start',align='center',font=('Impact',22))
 
 def MostrarHUD():
     #actualizar colores textos
-    if textScore.pencolor()==color_fondo:
+    if textScore.pencolor()==(0.1607843137254902, 0.8627450980392157, 0.30980392156862746):
         textScore.color('white')
+            #actualizar pantalla
+        textScore.clear()#limpiar texto
+        textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
     else:
         textScore.color(color_fondo)
-    #actualizar pantalla
-    textScore.clear()#limpiar texto
-    textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
+        textScore.clear()#limpiar texto
 
 def movimientoHeadSnake():
     oY = headSnake.ycor()  # guardar posicion y
@@ -113,9 +103,6 @@ def dirRight():
 def dirLeft():
     if headSnake.direction!='right':
         headSnake.direction = "left"
-
-def dirSpace():
-    MostrarHUD()
 
 #teclado entradas teclas
 window.listen()  # escuchando teclado
@@ -151,9 +138,11 @@ def ActualizarPuntuacion(sumar=0,reiniciar=False):
         if score>high_score:
             high_score=score
         score=0
-    #actualziar texto pantalla
-    textScore.clear()
-    textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
+    if textScore.pencolor()==(0.1607843137254902, 0.8627450980392157, 0.30980392156862746):
+        textScore.color('white')
+            #actualizar pantalla
+        textScore.clear()#limpiar texto
+        textScore.write(f'Score {score} / High Score {high_score}',align='center',font=('Impact',22))
 
 def ColisionVentana():
     tiempoDelay=0.55
@@ -210,17 +199,6 @@ def ReaparecerFood(manzana=1):
         if score==100:#mostrar manzana 2
             food2.color('#802411')
 
-    continuar=True
-    while continuar==True:
-        # valor aleatorio dentro de la ventana
-        px = random.randint(minDistance, int((window_width / 2) - minDistance))
-        py = random.randint(minDistance, int((window_height / 2) - minDistance))
-        # signo(cuadrante)
-        if random.randint(1, 2) == 1:
-            px *= -1
-        if random.randint(1, 2) == 1:
-            py *= -1
-        food.goto(px, py)
 
 def NuevoSegmentoCuerpo():
     #objeto segmento nuevo
@@ -266,8 +244,9 @@ def colisionSnakeBody():
 #controlador/ejecutador programa
 while True:#bucle infinito
     window.update()#actualizar canvas pantalla 
-    ColisionVentana()
-    ColisionFoodSnake()
-    colisionSnakeBody()
-    movimientoBody()#moviemeinto del snake
-    time.sleep(delay)#esperar en segundos y repetir bucle 
+    if headSnake.direction!="stop":
+        ColisionVentana()
+        ColisionFoodSnake()
+        colisionSnakeBody()
+        movimientoBody()#moviemeinto del snake
+        time.sleep(delay)#esperar en segundos y repetir bucle 
